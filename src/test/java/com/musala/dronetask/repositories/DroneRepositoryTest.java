@@ -27,20 +27,21 @@ public class DroneRepositoryTest {
 		String serial = UUID.randomUUID().toString();
 		
 		Drone drone = Drone.builder()
-				.id(Long.valueOf(1))
+				.id(1L)
 				.serialNumber(serial)
 				.weightLimit(500)
 				.batteryCapacity(60)
-				.model(DroneModel.HEAVYWEIGHT.name())
-				.state(DroneState.IDLE.name())
+				.model(DroneModel.HEAVYWEIGHT)
+				.state(DroneState.IDLE)
 				.build();
 		
-		droneRepository.save(drone);
+		Drone actual = droneRepository.save(drone);
 		// when
 		Optional<Drone> expected = droneRepository.findBySerialNumber(serial);
 		
 		// then
-		assertEquals(expected.get(), drone);
+		assertThat(actual).isEqualTo(expected.get());
+		//assertEquals(expected.get(), drone);
 	}
 	
 	

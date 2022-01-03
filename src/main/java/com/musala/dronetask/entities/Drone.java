@@ -4,21 +4,10 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Index;
-import javax.persistence.OneToMany;
-import javax.persistence.PrePersist;
-import javax.persistence.PreUpdate;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import javax.persistence.*;
 
+import com.musala.dronetask.enums.DroneModel;
+import com.musala.dronetask.enums.DroneState;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -27,7 +16,7 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "MS_DRONE", indexes = { 
-		@Index(columnList = "serialNumber", unique = true)
+		@Index(columnList = "serial_number", unique = true)
 })
 @Getter
 @Setter
@@ -47,9 +36,11 @@ public class Drone implements Serializable {
 	@Column(name = "battery_capacity", nullable = false)
 	private Integer batteryCapacity;
 	@Column(name = "model", length=100, nullable = false)
-	private String model;
+	@Enumerated(EnumType.STRING)
+	private DroneModel model;
 	@Column(name = "state", length=100, nullable = false)
-	private String state;
+	@Enumerated(EnumType.STRING)
+	private DroneState state;
 	@Column(name = "medications")
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = false)
 	private List<Medication> medications;

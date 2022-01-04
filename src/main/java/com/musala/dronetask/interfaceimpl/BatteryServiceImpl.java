@@ -1,7 +1,12 @@
 package com.musala.dronetask.interfaceimpl;
 
+import com.musala.dronetask.dto.request.DroneStateRequest;
+import com.musala.dronetask.dto.response.GenericResponse;
 import com.musala.dronetask.entities.Drone;
 import com.musala.dronetask.entities.Medication;
+import com.musala.dronetask.enums.DroneState;
+import com.musala.dronetask.enums.ResponseCode;
+import com.musala.dronetask.enums.ResponseStatus;
 import com.musala.dronetask.exceptions.CustomException;
 import com.musala.dronetask.interfaces.BatteryService;
 import com.musala.dronetask.services.DroneService;
@@ -31,4 +36,5 @@ public class BatteryServiceImpl implements BatteryService {
 
         return (droneInDb.getWeightLimit() - medicationSum) / 5;
     }
+
 }

@@ -12,7 +12,7 @@ public class AuditLogTask {
     private final AuditLogService logService;
 
     //@Scheduled(cron = "0 0 0 * * *") // midnight everyday
-    @Scheduled(fixedDelay = 1000)
+    @Scheduled(fixedDelay = 5000)
     public void logBatteryCapacity() {
 
         System.out.println("running audit log");

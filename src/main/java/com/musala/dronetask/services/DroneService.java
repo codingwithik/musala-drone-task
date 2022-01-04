@@ -5,7 +5,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.musala.dronetask.dto.request.DroneRegistrationRequest;
-import com.musala.dronetask.dto.request.DroneStateRequest;
 import com.musala.dronetask.dto.request.LoadDroneRequest;
 import com.musala.dronetask.dto.request.MedicationRequest;
 import com.musala.dronetask.dto.response.GenericResponse;
@@ -14,7 +13,6 @@ import com.musala.dronetask.enums.DroneState;
 import com.musala.dronetask.enums.ResponseCode;
 import com.musala.dronetask.enums.ResponseStatus;
 import com.musala.dronetask.exceptions.CustomException;
-import com.musala.dronetask.interfaces.BatteryService;
 import com.musala.dronetask.utils.Util;
 import org.springframework.stereotype.Service;
 
@@ -28,7 +26,6 @@ import lombok.RequiredArgsConstructor;
 public class DroneService {
 	
 	private final DroneRepository droneRepository;
-	private final BatteryService batteryService;
 
 	public Optional<Drone> findById(Long id) {
 		return droneRepository.findById(id);
@@ -119,20 +116,6 @@ public class DroneService {
 
 	}
 
-	public GenericResponse<?> updateDroneState(DroneStateRequest request) {
 
-		Drone droneInDb = findBySerialNumber(request.getSerialNumber()).orElseThrow(() ->
-				new CustomException("Drone serial number not found"));
-
-		if(request.getDroneState().equals(DroneState.LOADING) &&
-				batteryService.checkBatteryLevel(droneInDb.getSerialNumber()) < 25)
-			throw new CustomException("Drone battery level too low");
-
-		droneInDb.setState(request.getDroneState());
-		Drone updatedDrone = save(droneInDb);
-		return new GenericResponse<>(ResponseCode.SUCCESS.getCode(), ResponseStatus.SUCCESS,
-				"Request Successful", updatedDrone);
-
-	}
 
 }

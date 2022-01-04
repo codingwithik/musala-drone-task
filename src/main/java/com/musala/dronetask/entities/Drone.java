@@ -42,7 +42,7 @@ public class Drone implements Serializable {
 	@Enumerated(EnumType.STRING)
 	private DroneState state;
 	@Column(name = "medications")
-	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = false)
+	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	private List<Medication> medications;
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name="created_at")

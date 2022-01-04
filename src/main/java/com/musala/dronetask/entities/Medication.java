@@ -51,7 +51,14 @@ public class Medication implements Serializable {
 	@Column(name="updated_at")
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date updatedAt;
-	
+
+	public Medication(String name, Integer weight, String code, String image) {
+		this.name = name;
+		this.weight = weight;
+		this.code =  code;
+		this.image = image;
+	}
+
 	@PrePersist
 	private void setCreatedAt() {
 		createdAt = new Date();

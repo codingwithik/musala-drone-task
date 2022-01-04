@@ -10,7 +10,7 @@ import javax.validation.constraints.Size;
 public @Data class DroneRegistrationRequest {
 
     @Size(min = 10, max = 100, message="Serial Number must be between 10 and 100")
-    @NotNull(message = "serial Number is required")
+    @NotNull(message = "Serial Number is required")
     private String serialNumber;
     @NotNull(message = "Weight is required")
     private Integer weight;

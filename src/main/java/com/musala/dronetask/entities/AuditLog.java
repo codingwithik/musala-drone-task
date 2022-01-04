@@ -20,6 +20,7 @@ public class AuditLog implements Serializable {
 	private Long id;
 	@Column(name = "serial_number", length=100, nullable = false, unique=true)
 	private String serialNumber;
+	@Column(name = "drone_battery_level", length=100, nullable = false)
 	private Integer droneBatteryLevel;
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name="created_at")

@@ -50,8 +50,9 @@ public class DroneService {
 		return droneRepository.save(drone);
 	}
 
-	public long count() {
-		return droneRepository.count();
+	public GenericResponse<?> getAllDrones() {
+		return new GenericResponse<>(ResponseCode.SUCCESS.getCode(), ResponseStatus.SUCCESS,
+				"Request Successful", findAll());
 	}
 
 	public GenericResponse<?> droneRegistration(DroneRegistrationRequest request) {
@@ -109,7 +110,7 @@ public class DroneService {
 
 	}
 
-	public GenericResponse<?> checkingAvailableDrones() {
+	public GenericResponse<?> checkForAvailableDrones() {
 
 		List<Drone> droneInDb = findByState(DroneState.IDLE);
 

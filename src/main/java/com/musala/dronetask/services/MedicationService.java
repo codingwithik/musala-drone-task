@@ -37,36 +37,8 @@ public class MedicationService {
 		return (List<Medication>) medicationRepository.findAll();
 	}
 
-	public void deleteById(Long id) {
-		medicationRepository.deleteById(id);
-	}
-
-	public void delete(Medication medication) {
-		medicationRepository.delete(medication);
-	}
-
 	public Medication save(Medication medication) {
 		return medicationRepository.save(medication);
-	}
-
-	public void saveAll(List<Medication> medications) {
-		medicationRepository.saveAll(medications);
-	}
-
-	public boolean existsById(Long id) {
-		return medicationRepository.existsById(id);
-	}
-
-	public long count() {
-		return medicationRepository.count();
-	}
-
-	public void deleteAll(List<Medication> medications) {
-		medicationRepository.deleteAll(medications);
-	}
-
-	public void deleteAll() {
-		medicationRepository.deleteAll();
 	}
 
 	public GenericResponse<?> checkingLoadedMedicationItemsForDrone(String name) {

@@ -2,7 +2,9 @@ package com.musala.dronetask.repositories;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -58,4 +60,37 @@ public class DroneRepositoryTest {
 		assertThat(expected).isEmpty();
 	}
 
+	@Test
+	void given_a_valid_drone_state_return_object() {
+
+		// given
+		String serial = UUID.randomUUID().toString();
+
+		Drone drone = Drone.builder()
+				.id(1L)
+				.serialNumber(serial)
+				.weightLimit(500)
+				.batteryCapacity(60)
+				.model(DroneModel.HEAVYWEIGHT)
+				.state(DroneState.IDLE)
+				.build();
+
+		Drone drone2 = Drone.builder()
+				.id(2L)
+				.serialNumber(UUID.randomUUID().toString())
+				.weightLimit(300)
+				.batteryCapacity(70)
+				.model(DroneModel.HEAVYWEIGHT)
+				.state(DroneState.IDLE)
+				.build();
+
+		droneRepository.save(drone);
+		droneRepository.save(drone2);
+		// when
+		List<Drone> expected = droneRepository.findByState(DroneState.IDLE);
+
+		// then
+		assertEquals(2, expected.size());
+
+	}
 }

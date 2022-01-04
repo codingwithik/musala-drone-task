@@ -5,13 +5,16 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.musala.dronetask.dto.request.DroneRegistrationRequest;
+import com.musala.dronetask.dto.request.DroneStateRequest;
 import com.musala.dronetask.dto.request.LoadDroneRequest;
 import com.musala.dronetask.dto.request.MedicationRequest;
 import com.musala.dronetask.dto.response.GenericResponse;
 import com.musala.dronetask.entities.Medication;
+import com.musala.dronetask.enums.DroneState;
 import com.musala.dronetask.enums.ResponseCode;
 import com.musala.dronetask.enums.ResponseStatus;
 import com.musala.dronetask.exceptions.CustomException;
+import com.musala.dronetask.interfaces.BatteryService;
 import com.musala.dronetask.utils.Util;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +28,7 @@ import lombok.RequiredArgsConstructor;
 public class DroneService {
 	
 	private final DroneRepository droneRepository;
+	private final BatteryService batteryService;
 
 	public Optional<Drone> findById(Long id) {
 		return droneRepository.findById(id);
@@ -34,64 +38,47 @@ public class DroneService {
 		return droneRepository.findBySerialNumber(number);
 	}
 
+	public List<Drone> findByState(DroneState state) {
+		return droneRepository.findByState(state);
+	}
+
 	public List<Drone> findAll() {
 		return (List<Drone>) droneRepository.findAll();
-	}
-
-	public void deleteById(Long id) {
-		droneRepository.deleteById(id);
-	}
-
-	public void delete(Drone drone) {
-		droneRepository.delete(drone);
 	}
 
 	public Drone save(Drone drone) {
 		return droneRepository.save(drone);
 	}
 
-	public void saveAll(List<Drone> drones) {
-		droneRepository.saveAll(drones);
-	}
-
-	public boolean existsById(Long id) {
-		return droneRepository.existsById(id);
-	}
-
 	public long count() {
 		return droneRepository.count();
 	}
 
-	public void deleteAll(List<Drone> drones) {
-		droneRepository.deleteAll(drones);
-	}
+	public GenericResponse<?> droneRegistration(DroneRegistrationRequest request) {
 
-	public void deleteAll() {
-		droneRepository.deleteAll();
-	}
-
-	public GenericResponse<?> droneRegistration(DroneRegistrationRequest drone) {
-
-		if(!Util.validateDroneBatteryCapacity(drone.getBatteryCapacity()))
+		if(!Util.validateDroneBatteryCapacity(request.getBatteryCapacity()))
 			throw new CustomException("invalid drone battery capacity");
 
-		if(!Util.validateDroneWeightLimit(drone.getWeight()))
+		if(!Util.validateDroneWeightLimit(request.getWeight()))
 			throw new CustomException("invalid drone weight limit");
 
-		if(findBySerialNumber(drone.getSerialNumber()).isPresent())
-			throw new CustomException("Serial number already exists");
+		Drone droneInDb = findBySerialNumber(request.getSerialNumber()).orElseThrow(() ->
+				new CustomException("Drone serial number not found"));
+
+		if(!droneInDb.getState().equals(DroneState.LOADING))
+			throw new CustomException("Update drone state to Loading before loading any items");
 
 		Drone newDrone = Drone.builder()
-				.serialNumber(drone.getSerialNumber())
-				.batteryCapacity(drone.getBatteryCapacity())
-				.model(drone.getDroneModel())
-				.state(drone.getDroneState())
+				.serialNumber(request.getSerialNumber())
+				.batteryCapacity(request.getBatteryCapacity())
+				.model(request.getDroneModel())
+				.state(request.getDroneState())
 				.build();
 
-		Drone droneInDb = save(newDrone);
+		Drone drone = save(newDrone);
 
 		return new GenericResponse<>(ResponseCode.SUCCESS.getCode(), ResponseStatus.SUCCESS,
-				"Request Successful", droneInDb);
+				"Request Successful", drone);
 
 	}
 
@@ -110,15 +97,40 @@ public class DroneService {
 			throw new CustomException("Medication weight exceeds drone limit");
 
 		List<Medication> medications = drone.getItems().stream()
-						.map(m -> new Medication(m.getName(), m.getWeight(), m.getCode(), m.getImage()))
+						.map(m -> new Medication(droneIndb.getId(), m.getName(), m.getWeight(), m.getCode(), m.getImage()))
 				        .collect(Collectors.toList());
 
-		droneIndb.setMedications(medications);
+		if(allItemsWeightSum == droneIndb.getWeightLimit()) droneIndb.setState(DroneState.LOADED);
 
+		droneIndb.setMedications(medications);
 		Drone droneInDb = save(droneIndb);
+		return new GenericResponse<>(ResponseCode.SUCCESS.getCode(), ResponseStatus.SUCCESS,
+				"Request Successful", droneInDb);
+
+	}
+
+	public GenericResponse<?> checkingAvailableDrones() {
+
+		List<Drone> droneInDb = findByState(DroneState.IDLE);
 
 		return new GenericResponse<>(ResponseCode.SUCCESS.getCode(), ResponseStatus.SUCCESS,
 				"Request Successful", droneInDb);
+
+	}
+
+	public GenericResponse<?> updateDroneState(DroneStateRequest request) {
+
+		Drone droneInDb = findBySerialNumber(request.getSerialNumber()).orElseThrow(() ->
+				new CustomException("Drone serial number not found"));
+
+		if(request.getDroneState().equals(DroneState.LOADING) &&
+				batteryService.checkBatteryLevel(droneInDb.getSerialNumber()) < 25)
+			throw new CustomException("Drone battery level too low");
+
+		droneInDb.setState(request.getDroneState());
+		Drone updatedDrone = save(droneInDb);
+		return new GenericResponse<>(ResponseCode.SUCCESS.getCode(), ResponseStatus.SUCCESS,
+				"Request Successful", updatedDrone);
 
 	}
 

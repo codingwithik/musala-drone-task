@@ -22,8 +22,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "MS_MEDICATION", indexes = { 
-		@Index(columnList = "name", unique = true),
+@Table(name = "MS_MEDICATION", indexes = {
 		@Index(columnList = "code", unique = true)
 })
 @Getter
@@ -37,7 +36,9 @@ public class Medication implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	@Column(name="name", nullable = false, unique = true, length = 100)
+	@Column(name="drone_id", nullable = false)
+	private Long droneId;
+	@Column(name="name", nullable = false, length = 100)
 	private String name;
 	@Column(name = "weight", nullable = false)
 	private Integer weight;
@@ -52,7 +53,8 @@ public class Medication implements Serializable {
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date updatedAt;
 
-	public Medication(String name, Integer weight, String code, String image) {
+	public Medication(long id, String name, Integer weight, String code, String image) {
+		this.droneId = id;
 		this.name = name;
 		this.weight = weight;
 		this.code =  code;

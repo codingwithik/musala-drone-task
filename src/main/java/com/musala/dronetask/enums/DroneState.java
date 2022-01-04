@@ -3,7 +3,8 @@ package com.musala.dronetask.enums;
 public enum DroneState {
 
 	IDLE("IDLE"),
-	LOADING("LOADING"), 
+	LOADING("LOADING"),
+	LOADED("LOADED"),
 	DELIVERING("DELIVERING"), 
 	DELIVERED("DELIVERED"), 
 	RETURNING("RETURNING");
